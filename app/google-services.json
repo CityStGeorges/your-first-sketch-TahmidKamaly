@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1071147804255",
+    "project_id": "smartwaterintake",
+    "storage_bucket": "smartwaterintake.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1071147804255:android:80b47222d1a53f21f01dea",
+        "android_client_info": {
+          "package_name": "com.companies.smartwaterintake"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCA0BNE3DomDIhtVbnNeKRDRcB685Ks9y8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
