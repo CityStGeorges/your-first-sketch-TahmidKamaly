@@ -6,9 +6,12 @@ import kotlinx.serialization.Serializable
 import java.util.UUID
 
 data class Day(
+    val weight : String,
+    val height : String,
     val date: LocalDate,
     val hydration: List<Hydration>,
     val goal: Milliliters,
+
     val id: String = UUID.randomUUID().toString()
 ) : Comparable<Day> {
 
@@ -28,4 +31,3 @@ fun List<Day.Hydration>.sumOfMilliliters(): Milliliters {
     return Milliliters(sumOf { it.milliliters.value })
 }
 
-fun Day.reachedGoal(): Boolean = hydration.sumOfMilliliters() >= goal

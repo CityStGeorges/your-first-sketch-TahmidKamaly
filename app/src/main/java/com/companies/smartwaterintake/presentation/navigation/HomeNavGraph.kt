@@ -5,6 +5,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.companies.smartwaterintake.presentation.home.HomeScreen
+import com.companies.smartwaterintake.presentation.profile.ProfileScreen
 
 fun NavGraphBuilder.HomeNavGraph(
     navHostController: NavHostController,
@@ -16,7 +17,11 @@ fun NavGraphBuilder.HomeNavGraph(
         composable(
             route = BottomBar.HomeScreen.route,
         ) {
-            HomeScreen()
+            HomeScreen(navHostController = navHostController)
+        }
+
+        composable(route = BottomBar.ProfileScreen.route) {
+            ProfileScreen(navHostController = navHostController)
         }
 
     }
