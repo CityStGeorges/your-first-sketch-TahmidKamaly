@@ -5,6 +5,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,6 +20,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -38,8 +40,8 @@ import com.companies.smartwaterintake.presentation.navigation.BottomNavigationBa
 @Composable
 fun ProfileScreen(
     viewModel: ProfileViewModel = hiltViewModel(),
-    navHostController: NavHostController
-){
+    navHostController: NavHostController,
+) {
     val username = viewModel.username.collectAsState() // Collecting the username
     val name = username.value
     var changeUsername by remember { mutableStateOf(name) } // Separate state for editing
@@ -78,7 +80,7 @@ fun ProfileScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 40.dp),
+                    .padding(top = 40.dp, start = 8.dp, end = 8.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center,
             ) {
@@ -105,6 +107,16 @@ fun ProfileScreen(
                 }
             }
             Spacer(Modifier.height(40.dp))
+            Row(modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 8.dp, end = 8.dp)
+            ) {
+                TextButton(onClick = {
+                    changeUsernameDialog = true
+                }, contentPadding = PaddingValues(0.dp)) {
+                    Text("Change Username")
+                }
+            }
         }
     }
 }

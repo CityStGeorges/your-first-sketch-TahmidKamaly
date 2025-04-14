@@ -5,6 +5,7 @@ plugins {
     id("kotlin-kapt")
     id("com.google.dagger.hilt.android")
     id("com.google.gms.google-services")
+    id("org.jetbrains.kotlin.plugin.serialization")
 }
 
 android {
@@ -76,6 +77,14 @@ dependencies {
     implementation ("com.google.firebase:firebase-firestore-ktx")
     implementation ("androidx.compose.material:material:1.7.8")
     implementation("androidx.navigation:navigation-compose:2.8.9")
+    implementation("androidx.datastore:datastore-preferences-core:1.1.4")
+    implementation("androidx.datastore:datastore-preferences:1.1.4")
+    implementation("androidx.lifecycle:lifecycle-process:2.8.7")
+    implementation ("com.google.accompanist:accompanist-permissions:0.37.2")
+    implementation ("com.google.android.gms:play-services-location:21.3.0")
+    implementation("androidx.room:room-runtime:2.7.0")
+    implementation("androidx.room:room-ktx:2.7.0")
+    kapt("androidx.room:room-compiler:2.7.0")
 
 
 }
