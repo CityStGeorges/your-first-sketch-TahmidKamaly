@@ -8,6 +8,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.WaterDrop
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.runtime.Composable
@@ -29,6 +30,7 @@ fun GoalOfTheDayDialog(
     onClose : () -> Unit
 ) {
     AlertDialog(
+        backgroundColor = MaterialTheme.colorScheme.background,
         title = {
             Text("Goal of the Day")
         },
@@ -46,7 +48,7 @@ fun GoalOfTheDayDialog(
                     onMillilitersChanged = { dispatch(AppAction.SetDailyGoal(it)) }
                 )
             }
-            Text(text = state.dailyGoal.format(state.liquidUnit))
+            Text(text = state.dailyGoal.format(state.liquidUnit), color = MaterialTheme.colorScheme.surface)
         },
         onDismissRequest = onClose,
         buttons = {}

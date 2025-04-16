@@ -45,6 +45,7 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TimePicker
+import androidx.compose.material3.TimePickerDefaults
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -202,7 +203,7 @@ private fun ReminderSettingsSection(
     canScheduleAlarms: Boolean,
     reminder: Reminder?,
     onRemindersChanged: (Reminder?) -> Unit,
-    onSetInterval: () -> Unit,
+    onSetInterval: () -> Unit
 ) {
     var showPermissionRationaleDialog by remember { mutableStateOf(false) }
     var showScheduleAlarmsDialog by remember { mutableStateOf(false) }
@@ -496,7 +497,11 @@ fun SettingItem(
             .clickable(onClick = onClick)
             .padding(horizontal = 20.dp),
         headlineContent = {
-            Text(text = fieldName, style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.surface)
+            Text(
+                text = fieldName,
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.surface
+            )
         },
         supportingContent = {
             if (value != null) {
@@ -522,7 +527,11 @@ fun ToggleSettingItem(
     HydroListItem(
         modifier = modifier.padding(horizontal = 20.dp),
         headlineContent = {
-            Text(text = fieldName, style = MaterialTheme.typography.titleSmall)
+            Text(
+                text = fieldName,
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.surface
+            )
         },
         leadingContent = {
             Icon(
@@ -576,6 +585,7 @@ fun TimePickerDialog(
         )
     ) {
         Surface(
+            color = MaterialTheme.colorScheme.background,
             shape = MaterialTheme.shapes.extraLarge,
             tonalElevation = 6.dp,
             modifier = Modifier
@@ -598,7 +608,21 @@ fun TimePickerDialog(
                     style = MaterialTheme.typography.labelMedium
                 )
 
-                TimePicker(state = state)
+                TimePicker(state = state, colors = TimePickerDefaults.colors(
+                    containerColor = MaterialTheme.colorScheme.background,
+                    clockDialColor = MaterialTheme.colorScheme.background,
+                    clockDialSelectedContentColor = MaterialTheme.colorScheme.surface,
+                    clockDialUnselectedContentColor = MaterialTheme.colorScheme.surface,
+                    timeSelectorSelectedContainerColor = MaterialTheme.colorScheme.background,
+                    timeSelectorUnselectedContentColor = MaterialTheme.colorScheme.surface,
+                    timeSelectorSelectedContentColor = MaterialTheme.colorScheme.surface,
+                    timeSelectorUnselectedContainerColor = MaterialTheme.colorScheme.background ,
+                    periodSelectorSelectedContentColor = MaterialTheme.colorScheme.surface,
+                    periodSelectorUnselectedContainerColor = MaterialTheme.colorScheme.background,
+                    periodSelectorSelectedContainerColor = MaterialTheme.colorScheme.background,
+                    periodSelectorUnselectedContentColor = MaterialTheme.colorScheme.surface,
+                    periodSelectorBorderColor = MaterialTheme.colorScheme.surface
+                ))
                 Row(
                     modifier = Modifier
                         .height(40.dp)

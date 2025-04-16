@@ -6,8 +6,6 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.core.content.getSystemService
 import com.companies.smartwaterintake.App
@@ -40,13 +38,8 @@ class ReminderAlarmService(
     private val alarmManager: AlarmManager = checkNotNull(context.getSystemService())
 
     private val canScheduleAlarmsNow: Boolean
-        get() = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            alarmManager.canScheduleExactAlarms()
-        } else {
-            true // assume we can schedule alarms on older devices
-        }
+        get() = alarmManager.canScheduleExactAlarms()
 
-    @RequiresApi(Build.VERSION_CODES.S)
     val canScheduleAlarms: StateFlow<Boolean> = callbackFlow {
         send(canScheduleAlarmsNow)
         val receiver = object : BroadcastReceiver() {
@@ -63,7 +56,6 @@ class ReminderAlarmService(
         awaitClose { context.unregisterReceiver(receiver) }
     }.stateIn(scope, SharingStarted.Eagerly, canScheduleAlarmsNow)
 
-    @RequiresApi(Build.VERSION_CODES.S)
     suspend fun setAlarm(reminder: Reminder) {
         clear()
         check(canScheduleAlarms.value) { "cannot schedule exact reminders without permission." }

@@ -47,7 +47,7 @@ class NotificationService(
                 Channel.Hydrate.id
             ).apply {
                 setSmallIcon(R.drawable.ic_notification)
-                setContentTitle("Hydration Reminder")
+                setContentTitle("Water Reminder")
                 setContentText(todayMilliliters.asReminderMessage())
                 setSubText("${todayMilliliters.format(liquidUnit)} (${todayProgress.format()})")
                 setColor(NOTIFICATION_COLOR)
@@ -62,7 +62,7 @@ class NotificationService(
                     )
                 }
                 setShowWhen(true)
-                setAutoCancel(true)
+                setAutoCancel(false)
             }.build()
         )
     }

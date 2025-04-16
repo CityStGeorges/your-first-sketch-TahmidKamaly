@@ -28,6 +28,5 @@ fun List<Day.Hydration>.sumOfMilliliters(): Milliliters {
     return Milliliters(sumOf { it.milliliters.value })
 }
 
-fun Day.reachedGoal(): Boolean = hydration.sumOfMilliliters() >= goal
 
 

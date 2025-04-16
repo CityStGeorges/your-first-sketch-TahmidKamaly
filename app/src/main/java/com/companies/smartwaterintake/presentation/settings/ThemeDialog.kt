@@ -56,13 +56,15 @@ fun ThemeDialog(
                             Icon(
                                 imageVector = theme.icon(),
                                 contentDescription = "theme icon",
+                                tint = MaterialTheme.colorScheme.surface,
                                 modifier = Modifier.size(24.dp)
                             )
                             Spacer(modifier = Modifier.width(12.dp))
                             Text(
                                 text = theme.format(),
                                 style = MaterialTheme.typography.bodyLarge,
-                                modifier = Modifier.weight(1f)
+                                modifier = Modifier.weight(1f),
+                                color = MaterialTheme.colorScheme.surface
                             )
                             if (state.theme == theme) {
                                 Icon(
@@ -78,15 +80,6 @@ fun ThemeDialog(
                         if (theme == Theme.System) {
                             Text(
                                 text = "Current system theme is ${if (isSystemInDarkTheme()) "dark" else "light"}.",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.surface,
-                                modifier = Modifier.padding(start = 36.dp)
-                            )
-                        }
-
-                        if (theme == Theme.Dynamic) {
-                            Text(
-                                text = "Uses your phone's wallpaper to determine colors.",
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.surface,
                                 modifier = Modifier.padding(start = 36.dp)

@@ -1,5 +1,6 @@
 package com.companies.smartwaterintake.domain.service
 
+import android.content.Context
 import com.companies.smartwaterintake.domain.remote.WeatherApi
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -9,6 +10,7 @@ import com.stellerbyte.uptodo.services.implementation.AccountServiceImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -45,5 +47,4 @@ object StorageServiceModule {
     fun provideWeatherApi(retrofit: Retrofit): WeatherApi {
         return retrofit.create(WeatherApi::class.java)
     }
-
 }

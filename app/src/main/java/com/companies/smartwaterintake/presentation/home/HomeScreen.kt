@@ -3,6 +3,8 @@ package com.companies.smartwaterintake.presentation.home
 import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -43,6 +45,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.health.connect.client.HealthConnectClient
+import androidx.health.connect.client.PermissionController
+import androidx.health.connect.client.permission.HealthPermission
+import androidx.health.connect.client.records.StepsRecord
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.companies.smartwaterintake.AppAction
@@ -51,11 +57,13 @@ import com.companies.smartwaterintake.data.format
 import com.companies.smartwaterintake.data.icon
 import com.companies.smartwaterintake.data.isDarkTheme
 import com.companies.smartwaterintake.presentation.navigation.BottomNavigationBar
+import com.companies.smartwaterintake.ui.utils.HealthConnectUtils
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionStatus
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
@@ -70,6 +78,55 @@ fun HomeScreen(
         android.Manifest.permission.ACCESS_FINE_LOCATION,
     )
     val weatherResponse = homeViewModel.weatherState.collectAsState()
+    val steps = homeViewModel.steps.collectAsState()
+
+    val PERMISSIONS = setOf(
+        HealthPermission.getReadPermission(StepsRecord::class),
+        HealthPermission.getWritePermission(StepsRecord::class),
+    )
+
+    val requestPermissions =
+        rememberLauncherForActivityResult(PermissionController.createRequestPermissionResultContract()) { granted ->
+            if (granted.containsAll(PERMISSIONS)) {
+                // Permissions successfully granted , continue with reading the data from health connect
+                homeViewModel.loadDailySteps(context)
+            } else {
+                Toast.makeText(context, "Permissions are rejected", Toast.LENGTH_SHORT).show()
+
+            }
+
+        }
+
+    LaunchedEffect(key1 = true) {
+        when (HealthConnectUtils.checkForHealthConnectInstalled(context)) {
+            HealthConnectClient.SDK_UNAVAILABLE -> {
+                Toast.makeText(
+                    context,
+                    "Health Connect client is not available for this device",
+                    Toast.LENGTH_SHORT
+                ).show()
+
+            }
+
+
+            HealthConnectClient.SDK_UNAVAILABLE_PROVIDER_UPDATE_REQUIRED -> {
+                Toast.makeText(
+                    context,
+                    "Health Connect needs to be installed",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+
+            HealthConnectClient.SDK_AVAILABLE -> {
+                if (HealthConnectUtils.checkPermissions()) {
+                    homeViewModel.loadDailySteps(context)
+                } else {
+                    requestPermissions.launch(HealthConnectUtils.PERMISSIONS)
+                }
+
+            }
+        }
+    }
 
     LaunchedEffect(locationPermissionState.status) {
         when (locationPermissionState.status) {
@@ -84,6 +141,13 @@ fun HomeScreen(
             is PermissionStatus.Denied -> {
                 locationPermissionState.launchPermissionRequest()
             }
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        while (true) {
+            homeViewModel.loadDailySteps(context)
+            delay(5 * 60 * 1000L) // Every 5 minutes
         }
     }
 
@@ -112,6 +176,7 @@ fun HomeScreen(
             )
         }
     ) {
+
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -124,22 +189,33 @@ fun HomeScreen(
             )
 
             // Temperature (top)
-            Row(
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp)
                     .align(Alignment.TopStart),
-                verticalAlignment = Alignment.CenterVertically
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 val tempInCelsius = weatherResponse.value?.main?.temp?.minus(273.15)
+                dispatch(AppAction.SetTemperature(tempInCelsius ?: 0.0))
                 val temperatureText = tempInCelsius?.let { String.format("%.1f°C", it) } ?: "--°C"
                 Text(
-                    temperatureText,
+                    "Temperature: $temperatureText",
+                    color = MaterialTheme.colorScheme.surface,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 25.sp
+                )
+                Spacer(modifier = Modifier.height(5.dp))
+                dispatch(AppAction.setStepRecord(steps.value))
+                Text(
+                    text = "Steps Today: ${steps.value}",
                     color = MaterialTheme.colorScheme.surface,
                     fontWeight = FontWeight.Bold,
                     fontSize = 25.sp
                 )
             }
+
+
 
             Row(
                 modifier = Modifier

@@ -13,7 +13,6 @@ enum class Theme(
     val serialized: String
 ) {
     System("system"),
-    Dynamic("dynamic"),
     Dark("dark"),
     Light("light");
 
@@ -31,8 +30,7 @@ fun Theme.isDarkTheme(): Boolean {
     return when (this) {
         Theme.Dark -> true
         Theme.Light -> false
-        Theme.System,
-        Theme.Dynamic -> isSystemInDarkTheme()
+        Theme.System -> isSystemInDarkTheme()
     }
 }
 
@@ -41,7 +39,6 @@ fun Theme.format(): String {
         Theme.Dark -> "Dark"
         Theme.Light -> "Light"
         Theme.System -> "System"
-        Theme.Dynamic -> "Dynamic"
     }
 }
 
@@ -51,6 +48,5 @@ fun Theme.icon(): ImageVector {
         Theme.Dark -> Icons.Outlined.DarkMode
         Theme.Light -> Icons.Outlined.LightMode
         Theme.System -> Icons.Outlined.InvertColors
-        Theme.Dynamic -> Icons.Outlined.ColorLens
     }
 }

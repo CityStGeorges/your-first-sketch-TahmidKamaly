@@ -14,7 +14,7 @@ android {
 
     defaultConfig {
         applicationId = "com.companies.smartwaterintake"
-        minSdk = 29
+        minSdk = 31
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
@@ -85,6 +85,10 @@ dependencies {
     implementation("androidx.room:room-runtime:2.7.0")
     implementation("androidx.room:room-ktx:2.7.0")
     kapt("androidx.room:room-compiler:2.7.0")
+    implementation ("androidx.health.connect:connect-client:1.1.0-beta01")
+    implementation(libs.vico.compose.m3)
+    implementation ("co.yml:ycharts:2.1.0")
+
 
 
 }

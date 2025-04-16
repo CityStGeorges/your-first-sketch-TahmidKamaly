@@ -6,6 +6,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.companies.smartwaterintake.AppAction
 import com.companies.smartwaterintake.AppState
+import com.companies.smartwaterintake.presentation.dairy.DairyScreen
 import com.companies.smartwaterintake.presentation.home.HomeScreen
 import com.companies.smartwaterintake.presentation.profile.ProfileScreen
 import com.companies.smartwaterintake.presentation.settings.SettingsScreen
@@ -26,13 +27,21 @@ fun NavGraphBuilder.HomeNavGraph(
         }
 
         composable(route = BottomBar.ProfileScreen.route) {
-            ProfileScreen(navHostController = navHostController)
+            ProfileScreen(navHostController = navHostController, state = state, dispatch = dispatch)
         }
 
         composable(Settings) {
             SettingsScreen(
                 state = state,
                 dispatch = dispatch,
+            )
+        }
+
+        composable(BottomBar.DairyScreen.route) {
+            DairyScreen(
+                navHostController = navHostController,
+                state = state,
+                dispatch = dispatch
             )
         }
 

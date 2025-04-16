@@ -22,6 +22,7 @@ fun BottomNavigationBar(
 ) {
     val pages = listOf(
         BottomBar.HomeScreen,
+        BottomBar.DairyScreen,
         BottomBar.ProfileScreen,
     )
     val navBackStackEntry = navController.currentBackStackEntryAsState()

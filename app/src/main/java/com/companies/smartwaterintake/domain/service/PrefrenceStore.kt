@@ -74,7 +74,22 @@ class PreferencesStore(
     suspend fun setLiquidUnit(unit: LiquidUnit) {
         context.dataStore.edit { it[liquidUnitKey] = unit.serialized }
     }
+    val height: Flow<String?> = context.dataStore.data.map { preferences ->
+        preferences[heightKey]
+    }
 
+    suspend fun setHeight(height: String) {
+        context.dataStore.edit { it[heightKey] = height }
+    }
+
+    // 🔥 NEW: Save and read weight
+    val weight: Flow<String?> = context.dataStore.data.map { preferences ->
+        preferences[weightKey]
+    }
+
+    suspend fun setWeight(weight: String) {
+        context.dataStore.edit { it[weightKey] = weight }
+    }
     suspend fun clear() {
         context.dataStore.edit(MutablePreferences::clear)
     }
@@ -87,5 +102,7 @@ class PreferencesStore(
         private val themeKey = stringPreferencesKey("theme")
         private val selectedCupsKey = stringPreferencesKey("selectedCups")
         private val liquidUnitKey = stringPreferencesKey("liquidUnit")
+        private val heightKey = stringPreferencesKey("height")
+        private val weightKey = stringPreferencesKey("weight")
     }
 }

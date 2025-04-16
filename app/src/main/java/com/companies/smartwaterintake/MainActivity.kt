@@ -24,7 +24,6 @@ class MainActivity : ComponentActivity() {
             val state = store.state.collectAsStateWithLifecycle()
             SmartWaterIntakeTheme(
                 darkTheme = state.value.theme.isDarkTheme(),
-                dynamicColor = state.value.theme == Theme.Dynamic
             ) {
                 RootNavigationGraphBuilder(
                     navHostController = rememberNavController(),

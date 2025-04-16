@@ -30,6 +30,20 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.datetime.Clock
+import kotlinx.datetime.DatePeriod
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.isoDayNumber
+import kotlinx.datetime.minus
+import kotlinx.datetime.number
+import kotlinx.datetime.plus
+import kotlinx.datetime.toLocalDateTime
+
+enum class DateRangeType {
+    WEEKLY, MONTHLY, YEARLY
+}
 
 data class AppState(
     val dailyGoal: Milliliters,
@@ -41,7 +55,13 @@ data class AppState(
     val selectedCups: List<Cup>,
     val appInForeground: Boolean,
     val liquidUnit: LiquidUnit,
-) {
+    val temperature: Double?, // ← Add this!
+    val height: String? = null,
+    val weight: String? = null,
+    val stepsRecord : Int = 0,
+    val hydrationChartData: List<Pair<LocalDate, Int>> = emptyList(),
+
+    ) {
     val hydrationProgress: Percent = Percent(
         todayHydration.value / dailyGoal.value.toFloat()
     )
@@ -55,12 +75,18 @@ sealed interface AppAction {
     data class SetReminder(val value: Reminder?) : AppAction
     data object RestartReminder : AppAction
     data class ShowHydrationReminderNotification(val forced: Boolean = false) : AppAction
+    data class SetTemperature(val value: Double) : AppAction // ← Add this
+    data class setStepRecord(val value : Int) : AppAction
     data class SetTheme(val value: Theme) : AppAction
     data class SetSelectedCups(val value: List<Cup>) : AppAction
+    data class setWeight(val value : String) : AppAction
+    data class setHeight(val value : String) : AppAction
     data class SetAppInForeground(val value: Boolean) : AppAction
     data class SetLiquidUnit(val value: LiquidUnit) : AppAction
     data object DeleteAll : AppAction
     data object ResetToday : AppAction
+    data class LoadHydrationChartData(val range: DateRangeType) : AppAction
+
 }
 
 class AppStore(
@@ -69,7 +95,7 @@ class AppStore(
     private val preferencesStore: PreferencesStore,
     private val reminderAlarmService: ReminderAlarmService,
     private val scope: CoroutineScope,
-    dateChangedService: DateChangedService
+    dateChangedService: DateChangedService,
 ) {
     private val _state = MutableStateFlow(
         kotlin.run {
@@ -92,7 +118,11 @@ class AppStore(
                         .ifEmpty { defaultSelectedCups(liquidUnit) }
                 },
                 appInForeground = true,
-            )
+                temperature = null,
+                height = runBlocking { preferencesStore.height.first() },
+                weight = runBlocking { preferencesStore.weight.first() },
+
+                )
         }
     )
     val state: StateFlow<AppState> = _state.asStateFlow()
@@ -109,6 +139,10 @@ class AppStore(
             }.launchIn(scope)
             theme.onEach { theme ->
                 _state.update { it.copy(theme = theme) }
+            }.launchIn(scope)
+            height.onEach { height -> _state.update { it.copy(height = height) }
+            }.launchIn(scope)
+            weight.onEach { weight -> _state.update { it.copy(weight = weight) }
             }.launchIn(scope)
 
             combine(
@@ -153,6 +187,14 @@ class AppStore(
                 }
             }
 
+            is AppAction.setWeight -> scope.launch {
+                preferencesStore.setWeight(action.value)
+            }
+
+            is AppAction.setHeight -> scope.launch {
+                preferencesStore.setHeight(action.value)
+            }
+
             is AppAction.AddHydration -> scope.launch {
                 notificationService.cancelHydrationReminderNotification()
                 val currentState = _state.value
@@ -190,8 +232,81 @@ class AppStore(
                 }
             }
 
+            is AppAction.LoadHydrationChartData -> scope.launch {
+                val now = Clock.System.now()
+                    .toLocalDateTime(TimeZone.currentSystemDefault())
+                    .date
+
+                val (startDate, endDate) = when (action.range) {
+                    DateRangeType.WEEKLY -> {
+                        // Using ISO day number (Monday = 1) to calculate offset correctly
+                        val daysToMonday = now.dayOfWeek.isoDayNumber - 1
+                        val monday = now.minus(daysToMonday.days)
+                        Pair(monday, monday.plus(6.days))
+                    }
+
+                    DateRangeType.MONTHLY -> {
+                        // Use now.month.number (1-based) to create the first day of the month
+                        val firstDay = LocalDate(now.year, now.month.number, 1)
+                        val lastDay = firstDay.plus(1.months).minus(1.days)
+                        Pair(firstDay, lastDay)
+                    }
+
+                    DateRangeType.YEARLY -> {
+                        val start = LocalDate(now.year, 1, 1)
+                        // Ensure consistency with month numbering
+                        val end = LocalDate(now.year, now.month.number, now.dayOfMonth)
+                        Pair(start, end)
+                    }
+                }
+
+                val allDatesInRange =
+                    generateDateSequence(startDate, endDate, action.range).toList()
+
+                val rawData = hydrationHistoryStore.getInRange(
+                    startDate.toEpochDays(),
+                    endDate.toEpochDays(),
+                    1000
+                )
+
+                val chartData = when (action.range) {
+                    DateRangeType.YEARLY -> {
+                        // Group by (year, month) using month-start dates
+                        val monthlySums = rawData.groupBy { entry ->
+                            val date = entry.date
+                            // Use date.month.number for proper month conversion
+                            LocalDate(date.year, date.month.number, 1)
+                        }
+                            .mapValues { it.value.sumOf { item -> item.hydration.sumOfMilliliters().value } }
+
+                        // Generate exactly 12 month entries
+                        (0..11).map { offset ->
+                            val monthStart = startDate.plus(offset, DateTimeUnit.MONTH)
+                            monthStart to (monthlySums[monthStart] ?: 0)
+                        }
+                    }
+
+                    else -> {
+                        // Daily exact mapping
+                        val grouped = rawData.groupBy { it.date }
+                            .mapValues { it.value.sumOf { h -> h.hydration.sumOfMilliliters().value } }
+
+                        allDatesInRange.map { date ->
+                            date to (grouped[date] ?: 0)
+                        }
+                    }
+                }
+
+                Log.d("Chart", "dispatch: $chartData")
+                _state.update { it.copy(hydrationChartData = chartData) }
+            }
+
+            is AppAction.setStepRecord -> scope.launch {
+                _state.update { it.copy(stepsRecord = action.value) }
+            }
+
             is AppAction.ShowHydrationReminderNotification -> scope.launch {
-                if (action.forced) {
+                if (action.forced || (_state.value.temperature ?: 0.0) > 20.0 || _state.value.stepsRecord >= 2000) {
                     val todayMilliliters = hydrationHistoryStore.day(Today).first()
                         ?.hydration
                         ?.sumOfMilliliters()
@@ -228,6 +343,10 @@ class AppStore(
                 it.copy(appInForeground = action.value)
             }
 
+            is AppAction.SetTemperature -> {
+                _state.update { it.copy(temperature = action.value) }
+            }
+
             is AppAction.ResetToday -> scope.launch {
                 val today = hydrationHistoryStore.day(Today).first() ?: return@launch
                 hydrationHistoryStore.setDay(today.copy(hydration = emptyList()))
@@ -238,4 +357,23 @@ class AppStore(
             }
         }
     }
+
+    private fun generateDateSequence(
+        start: LocalDate,
+        end: LocalDate,
+        rangeType: DateRangeType,
+    ): Sequence<LocalDate> = sequence {
+        var current = start
+        // Handle different range types with proper increments
+        while (current <= end) {
+            yield(current)
+            current = when (rangeType) {
+                DateRangeType.YEARLY -> current.plus(1, DateTimeUnit.MONTH)
+                else -> current.plus(1, DateTimeUnit.DAY)
+            }
+        }
+    }
+
+    val Int.days: DatePeriod get() = DatePeriod(days = this)
+    val Int.months: DatePeriod get() = DatePeriod(months = this)
 }

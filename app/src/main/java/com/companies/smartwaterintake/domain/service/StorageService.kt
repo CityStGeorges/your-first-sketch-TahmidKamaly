@@ -32,6 +32,12 @@ interface HydrationHistoryStore {
         pageSize: Int = 20
     ): List<Day>
 
+    suspend fun getInRange(
+        startDateExclusive: Int,
+        endDateInclusive: Int,
+        limit: Int
+    ): List<DayDTO>
+
     suspend fun delete(date: LocalDate)
     suspend fun clear()
 }
@@ -69,6 +75,14 @@ class SqliteHydrationHistoryStore(
 
     override suspend fun clear() = withContext(ioDispatcher) {
         database.clearAllTables()
+    }
+
+    override suspend fun getInRange(
+        startDateExclusive: Int,
+        endDateInclusive: Int,
+        limit: Int
+    ): List<DayDTO> = withContext(ioDispatcher) {
+        database.dayDao().getInRange(startDateExclusive, endDateInclusive, limit)
     }
 
     companion object {
@@ -119,6 +133,15 @@ interface DayDao {
 
     @Delete
     suspend fun delete(day: DayDTO)
+
+    @Query(
+        "SELECT * FROM day WHERE date BETWEEN :startDateExclusive AND :endDateInclusive ORDER BY date DESC LIMIT :limit"
+    )
+    fun getInRange(
+        startDateExclusive: Int,
+        endDateInclusive: Int,
+        limit: Int
+    ): List<DayDTO>
 }
 
 @Database(entities = [DayDTO::class], version = 1)
