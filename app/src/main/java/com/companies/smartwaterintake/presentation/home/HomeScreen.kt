@@ -31,6 +31,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -38,6 +42,8 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -49,6 +55,7 @@ import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.PermissionController
 import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.StepsRecord
+import androidx.health.connect.client.units.Volume.Companion.milliliters
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.companies.smartwaterintake.AppAction
@@ -64,6 +71,7 @@ import com.google.accompanist.permissions.rememberPermissionState
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
@@ -79,6 +87,10 @@ fun HomeScreen(
     )
     val weatherResponse = homeViewModel.weatherState.collectAsState()
     val steps = homeViewModel.steps.collectAsState()
+
+
+    val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
 
     val PERMISSIONS = setOf(
         HealthPermission.getReadPermission(StepsRecord::class),
@@ -174,7 +186,9 @@ fun HomeScreen(
                     actionIconContentColor = MaterialTheme.colorScheme.surface
                 )
             )
-        }
+        },
+        snackbarHost = { SnackbarHost(snackbarHostState) }
+
     ) {
 
         Box(
@@ -246,7 +260,21 @@ fun HomeScreen(
                     FloatingActionButton(
                         containerColor = MaterialTheme.colorScheme.primary,
                         contentColor = MaterialTheme.colorScheme.surface,
-                        onClick = { dispatch(AppAction.AddHydration(cup.milliliters)) },
+                        onClick = {
+                            coroutineScope.launch {
+                                val result = snackbarHostState.showSnackbar(
+                                    message = "${cup.milliliters} is added",
+                                    actionLabel = "Undo",
+                                    duration = SnackbarDuration.Short
+                                )
+
+                                if (result == SnackbarResult.ActionPerformed) {
+                                    // Undo hydration
+                                    dispatch(AppAction.RemoveHydration(cup.milliliters))
+                                }
+                            }
+                            dispatch(AppAction.AddHydration(cup.milliliters))
+                        },
                         content = {
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                 Icon(

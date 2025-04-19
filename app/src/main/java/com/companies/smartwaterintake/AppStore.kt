@@ -24,6 +24,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -72,6 +73,7 @@ data class AppState(
 sealed interface AppAction {
     data class SetDailyGoal(val value: Milliliters) : AppAction
     data class AddHydration(val value: Milliliters) : AppAction
+    data class RemoveHydration(val value : Milliliters) : AppAction
     data class SetReminder(val value: Reminder?) : AppAction
     data object RestartReminder : AppAction
     data class ShowHydrationReminderNotification(val forced: Boolean = false) : AppAction
@@ -213,6 +215,14 @@ class AppStore(
                             goal = currentState.dailyGoal
                         )
                     )
+                }
+            }
+
+            is AppAction.RemoveHydration -> scope.launch {
+                hydrationHistoryStore.removeLatestHydration(Today)
+                val updatedDay = hydrationHistoryStore.day(Today).firstOrNull()
+                updatedDay?.goal?.let { goal ->
+                    _state.update { it.copy(dailyGoal = goal) }
                 }
             }
 

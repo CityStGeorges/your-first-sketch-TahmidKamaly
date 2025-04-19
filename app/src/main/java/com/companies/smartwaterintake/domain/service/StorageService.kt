@@ -39,6 +39,7 @@ interface HydrationHistoryStore {
     ): List<DayDTO>
 
     suspend fun delete(date: LocalDate)
+    suspend fun removeLatestHydration(date: LocalDate)
     suspend fun clear()
 }
 
@@ -83,6 +84,16 @@ class SqliteHydrationHistoryStore(
         limit: Int
     ): List<DayDTO> = withContext(ioDispatcher) {
         database.dayDao().getInRange(startDateExclusive, endDateInclusive, limit)
+    }
+
+    override suspend fun removeLatestHydration(date: LocalDate) = withContext(ioDispatcher)
+    {
+        val currentDayDTO = database.dayDao().get(date).firstOrNull() ?: return@withContext
+        if (currentDayDTO.hydration.isNotEmpty()) {
+            val updatedHydration = currentDayDTO.hydration.dropLast(1)
+            val updatedDay = currentDayDTO.copy(hydration = updatedHydration)
+            database.dayDao().upsert(updatedDay)
+        }
     }
 
     companion object {
