@@ -2,7 +2,7 @@
 
 ## Overview
 
-The **Smart Daily Water Intake Tracker** is an Android application designed to help users maintain healthy hydration habits by tracking daily water consumption. The app offers intelligent reminders, weather and activity-based recommendations, and an easy-to-use interface for logging intake. It integrates modern Android development tools, including Jetpack Compose, Room Database, Google Fit API, OpenWeather API, and Firebase.
+The **Smart Daily Water Intake Tracker** is an Android application designed to help users maintain healthy hydration habits by tracking daily water consumption. The app offers intelligent reminders, weather and activity-based recommendations, and an easy-to-use interface for logging intake. It integrates modern Android development tools, including Jetpack Compose, Room Database, Healthconnect API, OpenWeather API, and Firebase.
 
 ## Features
 
