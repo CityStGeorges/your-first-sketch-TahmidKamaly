@@ -8,6 +8,7 @@ import androidx.health.connect.client.records.StepsRecord
 import androidx.health.connect.client.request.ReadRecordsRequest
 import androidx.health.connect.client.time.TimeRangeFilter
 import java.time.Instant
+import java.time.Instant.now
 
 object HealthConnectUtils {
 
@@ -75,6 +76,7 @@ object HealthConnectUtils {
         endTime: Instant
     ): Int {
         return try {
+
             val response = healthConnectClient?.readRecords(
                 ReadRecordsRequest(
                     StepsRecord::class,
@@ -84,9 +86,9 @@ object HealthConnectUtils {
             var totalSteps = 0
             response?.records?.forEach { stepRecord ->
                 totalSteps += stepRecord.count.toInt()
+                Log.d("StepDebug", "Count: ${stepRecord.count}, Start: ${stepRecord.startTime}, End: ${stepRecord.endTime}")
             }
             totalSteps
-            Log.d("HealthConnect", "Reading steps from $startTime to $endTime")
         } catch (e: Exception) {
             Log.e("HealthConnect", "Failed to read steps: ${e.message}")
             0

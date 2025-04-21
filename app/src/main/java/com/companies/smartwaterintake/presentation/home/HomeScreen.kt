@@ -55,7 +55,6 @@ import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.PermissionController
 import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.StepsRecord
-import androidx.health.connect.client.units.Volume.Companion.milliliters
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.companies.smartwaterintake.AppAction
@@ -101,7 +100,9 @@ fun HomeScreen(
         rememberLauncherForActivityResult(PermissionController.createRequestPermissionResultContract()) { granted ->
             if (granted.containsAll(PERMISSIONS)) {
                 // Permissions successfully granted , continue with reading the data from health connect
-                homeViewModel.loadDailySteps(context)
+                homeViewModel.loadDailySteps(context, onStepsLoaded = {
+                    dispatch(AppAction.setStepRecord(it))
+                })
             } else {
                 Toast.makeText(context, "Permissions are rejected", Toast.LENGTH_SHORT).show()
 
@@ -131,7 +132,9 @@ fun HomeScreen(
 
             HealthConnectClient.SDK_AVAILABLE -> {
                 if (HealthConnectUtils.checkPermissions()) {
-                    homeViewModel.loadDailySteps(context)
+                    homeViewModel.loadDailySteps(context, onStepsLoaded = {
+                        dispatch(AppAction.setStepRecord(it))
+                    })
                 } else {
                     requestPermissions.launch(HealthConnectUtils.PERMISSIONS)
                 }
@@ -158,7 +161,10 @@ fun HomeScreen(
 
     LaunchedEffect(Unit) {
         while (true) {
-            homeViewModel.loadDailySteps(context)
+            homeViewModel.loadDailySteps(context, onStepsLoaded = {
+                dispatch(AppAction.setStepRecord(it))
+            })
+
             delay(5 * 60 * 1000L) // Every 5 minutes
         }
     }
@@ -220,7 +226,6 @@ fun HomeScreen(
                     fontSize = 25.sp
                 )
                 Spacer(modifier = Modifier.height(5.dp))
-                dispatch(AppAction.setStepRecord(steps.value))
                 Text(
                     text = "Steps Today: ${steps.value}",
                     color = MaterialTheme.colorScheme.surface,

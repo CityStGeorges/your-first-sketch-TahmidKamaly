@@ -13,6 +13,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
 import javax.inject.Inject
@@ -40,9 +42,10 @@ class HomeViewModel @Inject constructor(
     private val _steps = MutableStateFlow(0)
     val steps: StateFlow<Int> = _steps.asStateFlow()
 
-    fun loadDailySteps(context: Context) {
+    fun loadDailySteps(context: Context, onStepsLoaded: (Int) -> Unit = {}) {
         viewModelScope.launch {
-            val todayMidnight = ZonedDateTime.now().truncatedTo(ChronoUnit.DAYS)
+            val zone = ZoneId.systemDefault()
+            val todayMidnight = LocalDate.now(zone).atStartOfDay(zone)
             val tomorrowMidnight = todayMidnight.plusDays(1)
 
             val startTime = todayMidnight.toInstant()
@@ -50,6 +53,8 @@ class HomeViewModel @Inject constructor(
 
             val stepsCount = HealthConnectUtils.readStepsByTimeRange(startTime, endTime)
             _steps.value = stepsCount
+            Log.d("Steps", "startTime : $startTime, count : $stepsCount, endTime : $endTime")
+            onStepsLoaded(stepsCount)
         }
     }
 }

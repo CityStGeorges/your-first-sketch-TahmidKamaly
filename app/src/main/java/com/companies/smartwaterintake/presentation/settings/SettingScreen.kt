@@ -296,7 +296,7 @@ private fun ReminderSettingsSection(
                     onConfirm = { hour, minute ->
                         showStartPicker = false
                         val start = LocalTime(hour, minute, 0)
-                        if (start > reminder.end) {
+                        if (start >= reminder.end) {
                             showStartBeforeEndAlert = true
                         } else {
                             onRemindersChanged(reminder.copy(start = start))
@@ -312,7 +312,7 @@ private fun ReminderSettingsSection(
                     onConfirm = { hour, minute ->
                         showEndPicker = false
                         val end = LocalTime(hour, minute, 0)
-                        if (reminder.start > end) {
+                        if (reminder.start >= end) {
                             showStartBeforeEndAlert = true
                         } else {
                             onRemindersChanged(reminder.copy(end = end))
