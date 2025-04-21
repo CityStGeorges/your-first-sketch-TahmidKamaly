@@ -18,41 +18,41 @@ SmartWaterIntake/
 │   ├── src/
 │   │   ├── main/
 │   │   │   ├── java/com/example/smartwaterintake/
-│   │   │   │   ├── ui/                         # Jetpack Compose UI screens and components
-│   │   │   │   │   ├── HomeScreen.kt           # Main dashboard showing water intake, steps, and reminders
-│   │   │   │   │   ├── DiaryScreen.kt          # Displays past hydration entries and trend graph
-│   │   │   │   │   ├── ProfileScreen.kt        # Allows users to view and edit personal profile details
-│   │   │   │   │   ├── WelcomeScreen.kt        # Optional welcome/introduction screen
-│   │   │   │   │   └── components/             # Reusable UI components (buttons, dialogs, charts)
-│   │   │   │   ├── data/                       # Local Room database setup
-│   │   │   │   │   ├── Cup.kt                  # Data class representing a single water intake entry
-│   │   │   │   │   ├── CupDao.kt               # DAO interface defining database operations for `Cup`
-│   │   │   │   │   ├── CupDatabase.kt          # Abstract RoomDatabase managing Cup table
-│   │   │   │   ├── api/                        # API integrations
-│   │   │   │   │   ├── WeatherApi.kt           # Retrofit interface for OpenWeatherMap API
-│   │   │   │   │   └── GoogleFitService.kt     # Class for accessing Google Fit step data
-│   │   │   │   ├── model/                      # Data and domain models
-│   │   │   │   │   ├── UserProfile.kt          # User profile data (weight, height, name)
-│   │   │   │   │   ├── WeatherData.kt          # Models temperature and humidity from OpenWeather
-│   │   │   │   │   └── HydrationGoal.kt        # Represents calculated water intake goals
-│   │   │   │   ├── viewmodel/                  # ViewModel classes for state handling
-│   │   │   │   │   ├── HomeViewModel.kt        # Manages state and logic for Home screen
-│   │   │   │   │   ├── DiaryViewModel.kt       # Manages past entries and graph logic
-│   │   │   │   │   ├── ProfileViewModel.kt     # Manages user input and hydration goal logic
-│   │   │   │   │   └── ReminderViewModel.kt    # Handles notification scheduling logic
-│   │   │   │   └── util/                       # Utility and helper functions
-│   │   │   │       ├── NotificationUtil.kt     # Utility class to send hydration reminders
-│   │   │   │       └── TimeUtils.kt            # Helpers for time/date formatting
+│   │   │   │   ├── ui/                        # Jetpack Compose UI screens and components
+│   │   │   │   │   ├── HomeScreen.kt          # Main dashboard showing water intake, steps, and reminders
+│   │   │   │   │   ├── DiaryScreen.kt         # Displays past hydration entries and trend graph
+│   │   │   │   │   ├── ProfileScreen.kt       # Allows users to view and edit personal profile details
+│   │   │   │   │   ├── WelcomeScreen.kt       # Optional welcome/introduction screen
+│   │   │   │   │   └── components/            # Reusable UI components (buttons, dialogs, charts)
+│   │   │   │   ├── data/                      # Local Room database setup
+│   │   │   │   │   ├── Cup.kt                 # Data class representing a single water intake entry
+│   │   │   │   │   ├── CupDao.kt              # DAO interface defining database operations for Cup
+│   │   │   │   │   ├── CupDatabase.kt         # Abstract RoomDatabase managing Cup table
+│   │   │   │   ├── api/                       # API integrations
+│   │   │   │   │   ├── WeatherApi.kt          # Retrofit interface for OpenWeatherMap API
+│   │   │   │   │   └── GoogleFitService.kt    # Class for accessing Google Fit step data
+│   │   │   │   ├── model/                     # Data and domain models
+│   │   │   │   │   ├── UserProfile.kt         # User profile data (weight, height, name)
+│   │   │   │   │   ├── WeatherData.kt         # Models temperature and humidity from OpenWeather
+│   │   │   │   │   └── HydrationGoal.kt       # Represents calculated water intake goals
+│   │   │   │   ├── viewmodel/                 # ViewModel classes for state handling
+│   │   │   │   │   ├── HomeViewModel.kt       # Manages state and logic for Home screen
+│   │   │   │   │   ├── DiaryViewModel.kt      # Manages past entries and graph logic
+│   │   │   │   │   ├── ProfileViewModel.kt    # Manages user input and hydration goal logic
+│   │   │   │   │   └── ReminderViewModel.kt   # Handles notification scheduling logic
+│   │   │   │   └── util/                      # Utility and helper functions
+│   │   │   │       ├── NotificationUtil.kt    # Utility class to send hydration reminders
+│   │   │   │       └── TimeUtils.kt           # Helpers for time/date formatting
 │   │   │   ├── res/
-│   │   │   │   ├── layout/                     # XML layout files (if any non-Compose screens exist)
-│   │   │   │   ├── values/                     # Resource values: strings, colors, themes
-│   │   │   │   │   ├── strings.xml             # App text strings
-│   │   │   │   │   ├── colors.xml              # App colour definitions
-│   │   │   │   │   └── themes.xml              # Material Design themes and styles
-│   │   │   │   ├── drawable/                   # Icons and vector assets
-│   │   │   │   │   └── ic_launcher.xml         # App launcher icon vector
-│   │   │   └── AndroidManifest.xml             # App permissions, services, and entry points
-├── build.gradle.kts                            # Root Gradle build configuration
-├── settings.gradle.kts                         # Project settings and module declarations
-└── README.md                                   # Project overview and documentation
+│   │   │   │   ├── layout/                    # XML layout files (if any non-Compose screens exist)
+│   │   │   │   ├── values/                    # Resource values: strings, colors, themes
+│   │   │   │   │   ├── strings.xml            # App text strings
+│   │   │   │   │   ├── colors.xml             # App colour definitions
+│   │   │   │   │   └── themes.xml             # Material Design themes and styles
+│   │   │   │   ├── drawable/                  # Icons and vector assets
+│   │   │   │   │   └── ic_launcher.xml        # App launcher icon vector
+│   │   │   └── AndroidManifest.xml            # App permissions, services, and entry points
+├── build.gradle.kts                           # Root Gradle build configuration
+├── settings.gradle.kts                        # Project settings and module declarations
+└── README.md                                  # Project overview and documentation
 
